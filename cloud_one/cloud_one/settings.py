@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import datetime
-import cloud_one
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,7 +27,10 @@ SECRET_KEY = '-^qnf*9tg*chwa&2n%stw#0*^!=8m$=(ik(!yp+cbo-4_!qn4l'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '13.209.45.228'
+    'www.sejoule.com',
+    'kena.sejoule.com',
+    'mj.sejoule.com',
+    'wang.sejoule.com'
 ]
 
 

@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 import operator
 # from tosca.metamodels import CapabilityType, PropertyAssignment, AttributeAssignment, propertyValue, attributeValue
-from tosca.validators import IsOfValidator
+# from tosca.validators import IsOfValidator
 
 #******************************************************************
 # CONSTS
