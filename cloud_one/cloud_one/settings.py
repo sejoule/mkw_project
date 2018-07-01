@@ -28,7 +28,10 @@ SECRET_KEY = '-^qnf*9tg*chwa&2n%stw#0*^!=8m$=(ik(!yp+cbo-4_!qn4l'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '13.209.45.228'
+    'www.sejoule.com',
+    'kena.sejoule.com',
+    'mj.sejoule.com',
+    'wang.sejoule.com'
 ]
 
 
@@ -84,7 +87,7 @@ WSGI_APPLICATION = 'cloud_one.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'onecloud',
+        'NAME': 'mj_db',
         'USER': 'onecloudusr',
         'PASSWORD': 'one4theM0n3y',
         'HOST': 'localhost',
