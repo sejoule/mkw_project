@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_mongoengine',
     'user_auth',
     'tosca'
 ]
@@ -94,6 +95,20 @@ DATABASES = {
     }
 }
 
+#if the db is moved to another server then this must be edited.
+from mongoengine import *
+connect('tosca')
+# connect(
+#     db='tosca',
+#     username='tosca',
+#     password='one4theM0n3y',
+#     host='localhost',
+#     port=27017,
+#     alias="default"
+# )
+
+# DATABASE_ROUTERS = ['tosca.models.MyDB2Router',]
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -103,6 +118,12 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+    # 'DEFAULT_PARSER_CLASSES': (
+    #     'rest_framework_yaml.parsers.YAMLParser',
+    # ),
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     'rest_framework_yaml.renderers.YAMLRenderer',
+    # ),
 }
 
 JWT_AUTH = {
@@ -180,4 +201,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_ROOT = '/static/'
+STATIC_URL = 'kena.sejoule.com/'
+
+MEDIA_ROOT = '/media/'
+# MEDIA_URL = 'kena.sejoule.com'
+
+try:
+    from local_settings import *
+except ImportError:
+    pass

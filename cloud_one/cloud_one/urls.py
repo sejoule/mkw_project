@@ -16,20 +16,24 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls import url, include
 from rest_framework import routers
-from user_auth.views import UserViewSet, GroupViewSet
+# from user_auth.views import  GroupViewSet #UserViewSet ,
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
-from user_auth.serializers import UserSerializer
+# from user_auth.serializers import UserSerializer
 from django.contrib.auth.models import User
 
 
-router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'groups', GroupViewSet)
+# router = routers.DefaultRouter()
+# router.register(r'users', UserViewSet)
+# router.register(r'groups', GroupViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    url(r'^', include(router.urls)),
+    #*********Top level urls***********
+    url(r'^users/', include('user_auth.urls')),
+    url(r'^tosca/', include('tosca.urls')),
+
+    #NOTE: admin and auth urls
     url(r'^admin', admin.site.urls),
     url(r'^api-user_auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token-user_auth/', obtain_jwt_token),
