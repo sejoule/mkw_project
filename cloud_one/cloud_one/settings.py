@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'cloud_one.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'onecloud',
+        'NAME': 'mj_db',
         'USER': 'onecloudusr',
         'PASSWORD': 'one4theM0n3y',
         'HOST': 'localhost',
