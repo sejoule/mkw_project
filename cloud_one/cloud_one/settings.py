@@ -201,11 +201,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-STATIC_ROOT = '/static/'
-STATIC_URL = 'kena.sejoule.com/'
+STATIC_URL = 'http://www.sejoule.com:8080/static/'
+STATIC_ROOT = '/home/ubuntu/static/'
 
-MEDIA_ROOT = '/media/'
-# MEDIA_URL = 'kena.sejoule.com'
+MEDIA_ROOT = '/home/ubuntu/media/'
+MEDIA_URL = 'http://www.sejoule.com:8080/media/'
 
 try:
     from local_settings import *
