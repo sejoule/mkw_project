@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 
 cloud_one/cloud_one/settings.py
+**/.idea/
