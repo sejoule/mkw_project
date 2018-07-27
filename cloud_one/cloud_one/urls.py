@@ -15,22 +15,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf.urls import url, include
-from rest_framework import routers
-# from user_auth.views import  GroupViewSet #UserViewSet ,
+from user_auth.views import  UserViewSet
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 # from user_auth.serializers import UserSerializer
 from django.contrib.auth.models import User
 
 
-# router = routers.DefaultRouter()
-# router.register(r'users', UserViewSet)
+
 # router.register(r'groups', GroupViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     #*********Top level urls***********
-    url(r'^users/', include('user_auth.urls')),
+    # url(r'^users/', include('user_auth.urls')),
+    url(r'^', include('user_auth.urls')),
     url(r'^tosca/', include('tosca.urls')),
 
     #NOTE: admin and auth urls

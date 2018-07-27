@@ -17,6 +17,18 @@ API views will be used and each required method, POST, PUT, GET, DELETE will be
 created. 
 '''
 class Attribute(APIView):
+    #TODO: change over to these functions
+    # def list(self, request):
+    #     pass
+    # def retrieve(self, request):
+    #     pass
+    # def update(self, request):
+    #     pass
+    # def create(self, request):
+    #     pass
+    # def destroy(self, request):
+    #     pass
+
     def get_object(self, name):
         return AttributeAssignment.objects(name=name).first()
 

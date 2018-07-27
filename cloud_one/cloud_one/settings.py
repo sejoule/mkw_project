@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'cloud_one.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mj_db',
+        'NAME': 'onecloud',
         'USER': 'onecloudusr',
         'PASSWORD': 'one4theM0n3y',
         'HOST': 'localhost',
@@ -201,11 +201,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-STATIC_URL = 'http://www.sejoule.com:8080/static/'
-STATIC_ROOT = '/home/ubuntu/static/'
+STATIC_URL = 'http://www.sejoule.com/static/'
+STATIC_ROOT = '/var/www/files/static/'
 
-MEDIA_ROOT = '/home/ubuntu/media/'
-MEDIA_URL = 'http://www.sejoule.com:8080/media/'
+MEDIA_ROOT = '/var/www/files/media/'
+MEDIA_URL = 'http://www.sejoule.com/media/'
 
 try:
     from local_settings import *
