@@ -1,11 +1,10 @@
 from django.conf.urls import url, include
-from .views import  Attribute
+from .views import  ServiceTemplateViewSet
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r'service_templates', ServiceTemplateViewSet, base_name='service_templates')
 
 urlpatterns = [
-    #---------Example urls-----------
-    url(r'attribute/create$', Attribute.as_view()), #HTTP Method=POST
-    url(r'attribute/delete$', Attribute.as_view()), #example urls HTTP Method = DELETE
-    url(r'attribute/update$', Attribute.as_view()), #HTTP Method = PUT
-    url(r'attribute/([a-zA-Z0-9_.-]+)/$',Attribute.as_view()), #HTTP Method = GET
-    #---------------------------------
+    url(r'^', include(router.urls)),
 ]
