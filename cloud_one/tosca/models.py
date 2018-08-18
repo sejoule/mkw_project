@@ -1,4 +1,8 @@
 from mongoengine import *
+from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+import yaml
 
 STRING_LENGTH = 100
 DESC_LENGTH   = 300
@@ -13,7 +17,7 @@ class Scalar(IntField, StringField, BooleanField):
 class RegExpression(StringField):
     pass
 
-class Value(IntField, StringField,BooleanField):
+class Value(IntField, StringField, BooleanField):
     pass
 
 class PropertyValueExpression(StringField):
@@ -51,7 +55,7 @@ class AttributeValueExpression(StringField):
 # exists – value for field exists
 
 
-class Version(Document):
+class Version(EmbeddedDocument):
     major_version = IntField(default=0, null= False)
     minor_version = IntField(default=0, null=False)
     fixed_version= IntField(null=True)
@@ -86,20 +90,20 @@ class PropertyFilterDefinition(Document):
     property_constraint_clause = ConstraintClause()
 
 
-class NodeFilterDefinition(Document):
+class NodeFilterDefinition(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     properties = ListField(PropertyFilterDefinition),
     capabilities =ListField(StringField(null=True, max_length=STRING_LENGTH)) #NOTE these are capability names or capability type names
 
 
-class RepositoryDefinition(Document):
+class RepositoryDefinition(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     description = StringField(null=False, max_length=DESC_LENGTH)
     url = URLField()
     credential = Credential(),
 
 
-class ArtifactDefinition(Document):
+class ArtifactDefinition(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     type = StringField(null=True, max_length=STRING_LENGTH)
     file = StringField(null=True, max_length=STRING_LENGTH)
@@ -108,14 +112,14 @@ class ArtifactDefinition(Document):
     deploy_path = StringField(null=True, max_length=STRING_LENGTH)
 
 
-class ImportDefinition(Document): 
+class ImportDefinition(EmbeddedDocument):
     file = StringField(null=True, max_length=STRING_LENGTH)
     repository =StringField(null=True, max_length=STRING_LENGTH)
     namespace_uri = StringField(null=True, max_length=STRING_LENGTH)
     namespace_prefix = StringField(null=True, max_length=STRING_LENGTH)
 
 
-class PropertyDefinition(Document):
+class PropertyDefinition(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     type = StringField(null=True, max_length=STRING_LENGTH)
     description = StringField(null=False, max_length=DESC_LENGTH),
@@ -135,17 +139,23 @@ class AttributeDefinition(Document):
     entry_schema = StringField(null=True, max_length=STRING_LENGTH)
 
 
-class PropertyAssignment(Document):
+class PropertyAssignment(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     value = Value() or PropertyValueExpression()
 
+    def clean(self):
+        if self.name is None:
+            raise ValidationError('Property Assignment requires a name')
+        if self.value is None:
+            raise ValidationError('Property Assignment requires a value')
 
-class AttributeAssignment(Document):
+
+class AttributeAssignment(EmbeddedDocument):
     name = StringField(null=False, max_length=STRING_LENGTH)
     value = Value() or AttributeValueExpression()
-    concrete_model = Document
+    # concrete_model = Document NOTE: review this
 
-class ParameterDefinition(Document):
+class ParameterDefinition(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     type = StringField(null=True, max_length=STRING_LENGTH)
     value = Any()
@@ -162,7 +172,7 @@ class OperationDefinition(Document):
     inputs = ListField(PropertyDefinition() or PropertyAssignment())
 
 
-class InterfaceDefinition(Document):
+class InterfaceDefinition(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     type = StringField(null=True, max_length=STRING_LENGTH)
     inputs = ListField(PropertyDefinition() or PropertyAssignment())
@@ -197,7 +207,7 @@ class ArtifactType(Document):
     file_ext = [StringField(null=True, max_length=STRING_LENGTH)]
     properties = ListField(PropertyDefinition())
 
-class InterfaceType(Document):
+class InterfaceType(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     derived_from = StringField(null=True, max_length=STRING_LENGTH)
     version = Version(),
@@ -205,7 +215,7 @@ class InterfaceType(Document):
     inputs = ListField(PropertyDefinition())
 
 
-class DataType(Document):
+class DataType(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     # type           = StringField(null=False, max_length=STRING_LENGTH)
     derived_from   = StringField(null=False, max_length=STRING_LENGTH)
@@ -214,7 +224,7 @@ class DataType(Document):
     constraints    = ListField(ConstraintClause()),#(to= constraint_clause),
     properties     = ListField(PropertyDefinition())#(to= PropertyDefinition),
 
-class CapabilityType(Document):
+class CapabilityType(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     # type = StringField(null=False, max_length=STRING_LENGTH)
     derived_from =  StringField(null=False, max_length=STRING_LENGTH)
@@ -225,7 +235,7 @@ class CapabilityType(Document):
     valid_source_type =  [StringField(null=False, max_length=STRING_LENGTH)]
 
 
-class NodeType(Document):
+class NodeType(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     derived_from =  StringField(null=False, max_length=STRING_LENGTH)
     version = Version()
@@ -238,7 +248,7 @@ class NodeType(Document):
     artifacts = ListField(ArtifactDefinition())
 
 
-class RelationshipType(Document):
+class RelationshipType(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     derived_from =  StringField(null=False, max_length=STRING_LENGTH)
     version = Version()
@@ -249,7 +259,7 @@ class RelationshipType(Document):
     valid_target_types = [StringField(null=False, max_length=STRING_LENGTH)]
 
 
-class GroupType(Document):
+class GroupType(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     derived_from =  StringField(null=False, max_length=STRING_LENGTH)
     version = Version()
@@ -259,7 +269,7 @@ class GroupType(Document):
     interfaces =  ListField(InterfaceDefinition())
 
 
-class PolicyType(Document):
+class PolicyType(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     derived_from =  StringField(null=False, max_length=STRING_LENGTH)
     version = Version()
@@ -269,13 +279,13 @@ class PolicyType(Document):
 
 #********************Template Specifications**************************************
 
-class CapabilityAssignment(Document):
+class CapabilityAssignment(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     properties =  ListField(PropertyAssignment())
     attributes =  ListField(AttributeAssignment())
 
 
-class RequirementAssignment(Document):
+class RequirementAssignment(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     capability =  StringField(null=False, max_length=STRING_LENGTH)
     node =  StringField(null=False, max_length=STRING_LENGTH)
@@ -286,74 +296,109 @@ class RequirementAssignment(Document):
     }
     node_filter =  NodeFilterDefinition()
 
+    def clean(self):
+        if self.name is None:
+            raise ValidationError('Requirement Assignemnt requires a name')
 
-class NodeTemplate(Document):
+
+class NodeTemplate(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     type =  StringField(null=False, max_length=STRING_LENGTH)
     description =  StringField(null=False, max_length=DESC_LENGTH)
-    directives =  [StringField(null=False, max_length=STRING_LENGTH)],
-    properties =  ListField(PropertyAssignment())
-    attributes =  ListField(AttributeAssignment())
-    requirements =  ListField(RequirementAssignment())
-    capabilities =  ListField(CapabilityAssignment())
-    interfaces =  ListField(InterfaceDefinition())
-    artifacts =  ListField(ArtifactDefinition())
-    node_filter =  NodeFilterDefinition()
+    directives =  [StringField(null=False, max_length=STRING_LENGTH)], #TODO change this to a list
+    properties =  ListField(EmbeddedDocumentField(PropertyAssignment))
+    attributes =  ListField(EmbeddedDocumentField(AttributeAssignment))
+    requirements =  ListField(EmbeddedDocumentField(RequirementAssignment))
+    capabilities =  ListField(EmbeddedDocumentField(CapabilityAssignment))
+    interfaces =  ListField(EmbeddedDocumentField(InterfaceDefinition))
+    artifacts =  ListField(EmbeddedDocumentField(ArtifactDefinition))
+    node_filter =  EmbeddedDocumentField(NodeFilterDefinition)
+    copy =  StringField(null=False, max_length=STRING_LENGTH)
+
+    def clean(self):
+        if self.name is None:
+            raise ValidationError('Node template requires a name')
+        if self.type is None:
+            raise ValidationError('Node template requires a type')
+
+
+class RelationshipTemplate(EmbeddedDocument):
+    name = StringField(null=True, max_length=STRING_LENGTH)
+    type =  StringField(null=False, max_length=STRING_LENGTH)
+    description =  StringField(null=False, max_length=DESC_LENGTH)
+    properties =  ListField(EmbeddedDocumentField(PropertyAssignment))
+    attributes =  ListField(EmbeddedDocumentField(AttributeAssignment))
+    interfaces =  ListField(EmbeddedDocumentField(InterfaceDefinition))
     copy =  StringField(null=False, max_length=STRING_LENGTH)
 
 
-class RelationshipTemplate(Document):
+class GroupDefinition(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     type =  StringField(null=False, max_length=STRING_LENGTH)
     description =  StringField(null=False, max_length=DESC_LENGTH)
-    properties =  ListField(PropertyAssignment)
-    attributes =  ListField(AttributeAssignment)
-    interfaces =  ListField(InterfaceDefinition)
-    copy =  StringField(null=False, max_length=STRING_LENGTH)
-
-
-class GroupDefinition(Document):
-    name = StringField(null=True, max_length=STRING_LENGTH)
-    type =  StringField(null=False, max_length=STRING_LENGTH)
-    description =  StringField(null=False, max_length=DESC_LENGTH)
-    properties =  ListField(PropertyAssignment())
+    properties =  ListField(EmbeddedDocumentField(PropertyAssignment))
     members =  ListField(StringField(null=False, max_length=STRING_LENGTH)),
-    interfaces =  ListField(InterfaceDefinition())
+    interfaces =  ListField(EmbeddedDocumentField(InterfaceDefinition))
 
 
-class PolicyDefinition(Document):
+class PolicyDefinition(EmbeddedDocument):
     name = StringField(null=True, max_length=STRING_LENGTH)
     type =  StringField(null=False, max_length=STRING_LENGTH)
     description =  StringField(null=False, max_length=DESC_LENGTH)
-    properties =  ListField(PropertyAssignment())
+    properties =  ListField(EmbeddedDocumentField(PropertyAssignment))
     targets =  [StringField(null=False, max_length=STRING_LENGTH)]
 
 
-class TopologyTemplate(Document):
+class TopologyTemplate(EmbeddedDocument):
     description =  StringField(null=False, max_length=DESC_LENGTH)
-    inputs =  ListField(PropertyDefinition)
-    node_templates =  ListField(NodeTemplate())
-    relationship_templates =  ListField(RelationshipTemplate())
-    groups =  ListField(GroupDefinition())
-    policies =  ListField(PolicyDefinition())
-    outputs =  ListField(ParameterDefinition())
+    inputs =  ListField(EmbeddedDocumentField(PropertyDefinition))
+    node_templates =  ListField(EmbeddedDocumentField(NodeTemplate))
+    relationship_templates =  ListField(EmbeddedDocumentField(RelationshipTemplate))
+    groups =  ListField(EmbeddedDocumentField(GroupDefinition))
+    policies =  ListField(EmbeddedDocumentField(PolicyDefinition))
+    outputs =  ListField(EmbeddedDocumentField(ParameterDefinition))
     substitution_mappings =  StringField(null=False, max_length=STRING_LENGTH) #NOTE: need to fix this
 
+    def clean(self):
+        if self.node_templates is []:
+            raise ValidationError('None Templates are required')
+        for node_template in self.node_templates:
+            node_template.clean()
 
 class ServiceTemplate(Document):
     name = StringField(null=True, max_length=STRING_LENGTH)
-    tosca_definition_version =  Version()
+    tosca_definition_version =  EmbeddedDocumentField(Version)
     meta_data =  (StringField(null=False, max_length=STRING_LENGTH)), #NOTE add keynames
     description = StringField(null=False, max_length=DESC_LENGTH)
     dsl_definitions =  StringField(null=False, max_length=STRING_LENGTH) #NOTE: Need to fix this
-    repositories =  ListField(RepositoryDefinition())
-    imports =  ListField(ImportDefinition())
-    artifacts =  ListField(ArtifactDefinition())
-    data_types =  ListField(DataType())
-    capability_types =  ListField(CapabilityType())
-    interface_types =  ListField(InterfaceType())
-    relationship_types =  ListField(RelationshipType())
-    node_types =  ListField(NodeType())
-    group_types =  ListField(GroupType())
-    policy_types =  ListField(PolicyType())
-    topology_template =  TopologyTemplate()
+    repositories =  ListField(EmbeddedDocumentField(RepositoryDefinition))
+    imports =  ListField(EmbeddedDocumentField(ImportDefinition))
+    artifacts =  ListField(EmbeddedDocumentField(ArtifactDefinition))
+    data_types =  ListField(EmbeddedDocumentField(DataType))
+    capability_types =  ListField(EmbeddedDocumentField(CapabilityType))
+    interface_types =  ListField(EmbeddedDocumentField(InterfaceType))
+    relationship_types =  ListField(EmbeddedDocumentField(RelationshipType))
+    node_types =  ListField(EmbeddedDocumentField(NodeType))
+    group_types =  ListField(EmbeddedDocumentField(GroupType))
+    policy_types =  ListField(EmbeddedDocumentField(PolicyType))
+    topology_template =  EmbeddedDocumentField(TopologyTemplate)
+
+    def clean(self):
+        if self.name is None:
+            raise ValidationError('name is a required field')
+        if self.topology_template is None:
+            raise ValidationError('Service Template should have a topology_template')
+        self.topology_template.clean()
+
+
+# *****************************************************************************************
+# This is used to represent the service template file that has been uploaded. This data is
+# stored in the Relational database instead of NoSQL.
+# *****************************************************************************************
+
+class ServiceTemplateFile(models.Model):
+    file = models.FileField(blank=True, null=True)
+    template_name = models.CharField(max_length=60, null= True)
+    template_id = models.CharField(max_length=60, null=True) #NOTE: reference to the service template _id
+    user = models.ForeignKey(User, on_delete=CASCADE, null= True) #NOTE the user that uploaded the template
+    created_date = models.DateTimeField(null=True)

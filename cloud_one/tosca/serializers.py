@@ -1,9 +1,9 @@
 from rest_framework_mongoengine.serializers import DocumentSerializer
+from rest_framework import serializers
 from .models import ServiceTemplate, TopologyTemplate, NodeTemplate, RelationshipTemplate, ArtifactType, ArtifactDefinition, \
     DataType, CapabilityType, CapabilityDefinition, Version, Credential, RelationshipType, PolicyType, PolicyDefinition, GroupDefinition, \
     AttributeAssignment, CapabilityAssignment, RequirementAssignment, ConstraintClause, ImportDefinition, InterfaceType, \
-    InterfaceDefinition, PropertyAssignment, OperationDefinition, RepositoryDefinition, NodeType, GroupType
-
+    InterfaceDefinition, PropertyAssignment, OperationDefinition, RepositoryDefinition, NodeType, GroupType, ServiceTemplateFile
 
 class VersionSerializer(DocumentSerializer):
     class Meta:
@@ -27,24 +27,31 @@ class CredentialSerializer(DocumentSerializer):
             'userh'
         )
 
-
-class NodeTemplateSerializer(DocumentSerializer):
-    class Meta:
-        model = NodeTemplate
-        fields = (
-            'name',
-            'type',
-            'description',
-            'directives',
-            'properties',
-            'attributes',
-            'requirements',
-            'capabilities',
-            'interfaces',
-            'artifacts',
-            'node_filter',
-            'copy'
-        )
+# class NodeTemplateInnerSerializer(DocumentSerializer):
+#     class Meta:
+#         model = NodeTemplate.NodeTemplate_Inner
+#         fields = (
+#             'type',
+#             'description',
+#             'directives',
+#             'properties',
+#             'attributes',
+#             'requirements',
+#             'capabilities',
+#             'interfaces',
+#             'artifacts',
+#             'node_filter',
+#             'copy'
+#         )
+#
+# class NodeTemplateSerializer(DocumentSerializer):
+#     class Meta:
+#         model = NodeTemplate
+#         node_template = NodeTemplateInnerSerializer
+#         fields = (
+#             'name',
+#             'node_template'
+#         )
 
 class RelationshipTemplateSerializer(DocumentSerializer):
     class Meta:
@@ -387,5 +394,10 @@ class ServiceTemplateSerializer(DocumentSerializer):
             'node_types',
             'group_types',
             'policy_types',
-            'topology_template'
+            'topology_template',
         )
+
+class FileSerializer(serializers.ModelSerializer):
+  class Meta():
+    model = ServiceTemplateFile
+    fields = ('file',)

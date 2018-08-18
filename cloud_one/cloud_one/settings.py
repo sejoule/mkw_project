@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_mongoengine',
     'user_auth',
-    'tosca'
+    'tosca',
+    'instantiator'
 ]
 
 MIDDLEWARE = [
@@ -118,12 +119,15 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
-    # 'DEFAULT_PARSER_CLASSES': (
-    #     'rest_framework_yaml.parsers.YAMLParser',
-    # ),
-    # 'DEFAULT_RENDERER_CLASSES': (
-    #     'rest_framework_yaml.renderers.YAMLRenderer',
-    # ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework_yaml.parsers.YAMLParser',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_yaml.renderers.YAMLRenderer',
+    ),
 }
 
 JWT_AUTH = {

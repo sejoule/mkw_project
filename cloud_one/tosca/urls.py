@@ -1,5 +1,5 @@
 from django.conf.urls import url, include
-from .views import  ServiceTemplateViewSet
+from .views import  FileUploadView, ServiceTemplateViewSet
 from rest_framework import routers
 
 router = routers.DefaultRouter()
