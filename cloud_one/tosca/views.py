@@ -100,7 +100,7 @@ class ServiceTemplateViewSet(viewsets.ViewSet):
                 )
             srv_temp_usr.save()
             # return Response(str(service_template['id']), status=status.HTTP_201_CREATED)
-            return Response(ServiceTemplateSerializer(service_template).data, status=status.HTTP_201_CREATED)
+            return Response(service_template['name'], status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response(e.to_dict(), status=status.HTTP_400_BAD_REQUEST)
 
