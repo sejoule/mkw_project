@@ -7,4 +7,5 @@ router.register(r'service_templates', ServiceTemplateViewSet, base_name='service
 
 urlpatterns = [
     url(r'^', include(router.urls)),
+    url(r'^service_templates/uploadyaml', FileUploadView.as_view()),
 ]

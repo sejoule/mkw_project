@@ -1,6 +1,8 @@
-from django.core.validators import BaseValidator
+from django.core.exceptions import ValidationError
+import magic
 
-class IsOfValidator(BaseValidator):
-    pass
-
-#Complete this validator to test if an item is part of a given set
+def validate_file(file):
+    filetype = magic.from_buffer(file.read())
+    if not "YML" or "YAML" in filetype:
+        raise ValidationError("File is not YAML.")
+    return file

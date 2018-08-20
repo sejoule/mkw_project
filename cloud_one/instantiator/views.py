@@ -11,6 +11,7 @@ def instantiate_app(request):
     template_name = request.data
     user_name = UserSerializer(request.user).data
     st_file = ServiceTemplateFile.objects.get(user__username=user_name, template_name=template_name)
-    template = st_file.template_ref
+    template = st_file.template_id
+    service_template = ServiceTemplate(id(template))
     return Response({'status':'{} was instantiated'.format(template_name)}, status=status.HTTP_201_CREATED)
     #NOTE launch the template here.
