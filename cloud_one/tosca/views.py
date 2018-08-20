@@ -13,7 +13,7 @@ from rest_framework_yaml.renderers import YAMLRenderer
 from mongoengine import *
 from rest_framework.parsers import FileUploadParser, MultiPartParser, FormParser
 from .transformers import *
-import datetime
+import datetime, yaml
 
 # Create your views here.
 
@@ -24,31 +24,30 @@ created.
 
 
 class FileUploadView(APIView):
-  parser_classes = (MultiPartParser, FormParser)
-  def post(self, request, *args, **kwargs):
-    file_serializer = FileSerializer(data=request.data)
-    if file_serializer.is_valid():
-      file_serializer.save()
-      return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-    else:
-      return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class YamlUploadView(APIView):
-#     parser_classes = (YAMLParser, JSONParser)
-#     # renderer_classes = (YAMLRenderer,)
-#     serializer_class = ServiceTemplateSerializer
-#
-#     def post(self, request, format=None):
-#         parsed = request.data
-#         # topology_template = TopologyTemplate(description='test_description')
-#         serviceTemplate = ServiceTemplate(
-#             name='name',
-#             topology_template=parsed['topology_template']
-#         )
-#         serviceTemplate.save(cascade=True)
-#         serializer = ServiceTemplateSerializer(serviceTemplate)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-#         # return Response({'received data': request.data})
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, *args, **kwargs):
+        file_serializer = FileSerializer(data=request.data)
+        if file_serializer.is_valid():
+            current_user = User.objects.get(username=UserSerializer(request.user).data['username'])
+            try:
+                file = file_serializer.validated_data['file']
+                data = yaml.load(file)
+                service_template = create_service_template(data)
+                service_template.clean()
+                service_template.save(cascade=True)
+                srv_temp_file = ServiceTemplateFile(
+                    file=file,
+                    template_name=service_template.name,
+                    template_id=str(service_template['id']),
+                    user=current_user,
+                    created_date=datetime.datetime.today()
+                )
+                srv_temp_file.save()
+            except ValidationError as e:
+                return Response(e.to_dict(), status=status.HTTP_400_BAD_REQUEST)
+            return Response(data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ServiceTemplateViewSet(viewsets.ViewSet):
@@ -99,7 +98,6 @@ class ServiceTemplateViewSet(viewsets.ViewSet):
                 created_date=datetime.datetime.today()
                 )
             srv_temp_usr.save()
-            # return Response(str(service_template['id']), status=status.HTTP_201_CREATED)
             return Response(ServiceTemplateSerializer(service_template).data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response(e.to_dict(), status=status.HTTP_400_BAD_REQUEST)

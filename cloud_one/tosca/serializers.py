@@ -1,5 +1,6 @@
 from rest_framework_mongoengine.serializers import DocumentSerializer
 from rest_framework import serializers
+from .validators import validate_file
 from .models import ServiceTemplate, TopologyTemplate, NodeTemplate, RelationshipTemplate, ArtifactType, ArtifactDefinition, \
     DataType, CapabilityType, CapabilityDefinition, Version, Credential, RelationshipType, PolicyType, PolicyDefinition, GroupDefinition, \
     AttributeAssignment, CapabilityAssignment, RequirementAssignment, ConstraintClause, ImportDefinition, InterfaceType, \
@@ -381,7 +382,7 @@ class ServiceTemplateSerializer(DocumentSerializer):
         topology_template = TopologyTemplateSerializer
         fields = (
             'tosca_definition_version',
-            'meta_data',
+            # 'meta_data',
             'description',
             'dsl_definitions',
             'repositories',
@@ -398,6 +399,8 @@ class ServiceTemplateSerializer(DocumentSerializer):
         )
 
 class FileSerializer(serializers.ModelSerializer):
+
   class Meta():
     model = ServiceTemplateFile
+    file = serializers.FileField(validators=[validate_file])
     fields = ('file',)

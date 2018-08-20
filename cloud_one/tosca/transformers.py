@@ -34,7 +34,7 @@ def create_node_template(data):
         # directives = [StringField(null=False, max_length=STRING_LENGTH)],
         properties = [create_property_assignment(property_assignment) for property_assignment in data[name].get('properties')] if data[name].get('properties') is not None else [],
         # attributes = [create_attribute(attribute) for attribute in data[name]['attribbutes']],
-        requirements = [create_requirement_assignment(requirement) for requirement in data[name]['requirements']],
+        requirements = [create_requirement_assignment(requirement) for requirement in data[name]['requirements']] if data[name].get('requirements') is not None else [],
         capabilities = [create_capability(capability) for capability in data[name].get('capabilities')] if data[name].get('capabilities') is not None else [],
         # interfaces = [create_interface(interface) for interface in data[name]['interfaces']],
         # artifacts = [create_artifact(artifact) for artifact in data[name]['artifacts']],
