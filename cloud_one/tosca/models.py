@@ -62,6 +62,13 @@ class Version(EmbeddedDocument):
     qualifier= StringField(null=True, max_length=STRING_LENGTH)
     build_version= IntField(null=True)
 
+    def clean(self):
+        if self.major_version is None or -1:
+            raise ValidationError('major version is required')
+        if self.minor_version is None or -1:
+            raise ValidationError('minor version is required')
+        if self.fixed_version is None or -1:
+            raise ValidationError('Major version is required')
 
 class Credential(Document):
     protocol   = StringField(null=True, max_length=STRING_LENGTH)
@@ -330,6 +337,12 @@ class RelationshipTemplate(EmbeddedDocument):
     attributes =  ListField(EmbeddedDocumentField(AttributeAssignment))
     interfaces =  ListField(EmbeddedDocumentField(InterfaceDefinition))
     copy =  StringField(null=False, max_length=STRING_LENGTH)
+
+    def clean(self):
+        if self.name is None:
+            raise ValidationError('Relationship template requires a name')
+        if self.type is None:
+            raise ValidationError('Relationship template requires a type')
 
 
 class GroupDefinition(EmbeddedDocument):
