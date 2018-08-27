@@ -1,5 +1,6 @@
 from .models import *
 import re
+# from transformers import create_property_assignment
 
 
 def create_version(data):
@@ -60,6 +61,104 @@ def create_artifact_type(data):
         mime_type = data[name].get('mime_type') if data[name].get('mime_type') is not None else '',
         file_ext = [file_ext for file_ext in data[name].get('file_ext')] if data[name].get('file_ext') is not None else [],
         properties = [create_property_definition(property_def) for property_def in data[name].get('properties')] if data[name].get('properties') is not None else [],
+    )
+
+def create_data_type(data):
+    name = list(data.keys())[0]
+    return DataType(
+        derived_from=data[name].get('derived_from') if data[name].get('derived_from') is not None else '',
+        version=create_version(data['tosca_definition_version']) if data['tosca_definition_version'] is not None else '',
+        description=data[name].get('description') if data[name].get('description') is not None else '',
+        constraints = [constraint for constraint in data[name].get('constraints')] if data[name].get('constraints') is not None else [],
+        properties=[create_property_definition(property_def) for property_def in data[name].get('properties')] if data[name].get('properties') is not None else [],
+    )
+
+def create_capability_type(data):
+    name = list(data.keys())[0]
+    return CapabilityType(
+        derived_from=data[name].get('derived_from') if data[name].get('derived_from') is not None else '',
+        version=create_version(data['tosca_definition_version']) if data['tosca_definition_version'] is not None else '',
+        description=data[name].get('description') if data[name].get('description') is not None else '',
+        properties=[create_property_definition(property_def) for property_def in data[name].get('properties')] if data[name].get('properties') is not None else [],
+        # attributes = ListField(AttributeDefinition())
+        valid_source_type = [valid_source for valid_source in data[name].get('valid_source_type')] if data[name].get('valid_source_type') is not None else []
+    )
+
+def create_relationship_type(data):
+    name =  list(data.keys())[0]
+    return RelationshipType(
+        derived_from=data[name].get('derived_from') if data[name].get('derived_from') is not None else '',
+        version=create_version(data['tosca_definition_version']) if data['tosca_definition_version'] is not None else '',
+        description=data[name].get('description') if data[name].get('description') is not None else '',
+        properties=[create_property_definition(property_def) for property_def in data[name].get('properties')] if data[name].get('properties') is not None else [],
+        # attributes = ListField(AttributeDefinition())
+        # interfaces = ListField(InterfaceDefinition())
+        valid_target_types = [valid_target_type for valid_target_type in data[name].get('valid_target_types')] if data[name].get('valid_target_types') is not None else []
+    )
+
+def create_requirement_definition(data):
+    name = list(data.keys())[0]
+    return RequirementDefinition(
+        capability = data[name]['capability'] if data[name]['capability'] is not None else '',
+        node = data[name]['node'] if data[name]['node'] is not None else '',
+        relationship = data[name]['relationship'] if data[name]['relationship'] is not None else ''
+        # node_filter = create_nodefilter() TODO: complete this
+    )
+
+def create_capability_definition(data):
+    name = list(data.keys())[0]
+    return CapabilityDefinition(
+        type=data[name].get('type') if data[name].get('type') is not None else '',
+        description=data[name].get('description') if data[name].get('description') is not None else '',
+        properties=[create_property_assignment(property_assignment) for property_assignment in data[name].get('properties')] if data[name].get('properties') is not None else [],
+        # attributes = ListField(AttributeDefinition())
+        valid_source_types = [valid_source for valid_source in data[name].get('valid_source_type')] if data[name].get('valid_source_type') is not None else [],
+        # occurrences = Range()
+    )
+
+def create_artifact_definition(data):
+    name = list(data.keys())[0]
+    return ArtifactDefinition(
+        type = data[name].get('type') if data[name].get('type') is not None else '',
+        file = data[name].get('file') if data[name].get('file') is not None else '',
+        repository = data[name].get('repository') if data[name].get('repository') is not None else '',
+        description = data[name].get('description') if data[name].get('description') is not None else '',
+        deploy_path = data[name].get('depoy_path') if data[name].get('deploy_path') is not None else '',
+    )
+
+def create_node_type(data):
+    name = list(data.keys())[0]
+    return NodeType(
+        derived_from=data[name].get('derived_from') if data[name].get('derived_from') is not None else '',
+        version=create_version(data['tosca_definition_version']) if data['tosca_definition_version'] is not None else '',
+        description=data[name].get('description') if data[name].get('description') is not None else '',
+        properties=[create_property_definition(property_def) for property_def in data[name].get('properties')] if data[name].get('properties') is not None else [],
+        # attributes = ListField(AttributeDefinition())
+        requirements = [create_requirement_definition(requirement_def) for requirement_def in data[name].get('requirements')] if data[name].get('requirements') is not None else [],
+        capabilities = [create_capability_definition(capability_def) for capability_def in data[name].get('capabilities')] if data[name].get('capabilities') is not None else [],
+        # interfaces = ListField(InterfaceDefinition())
+        artifacts = [create_artifact_definition(artifact_def) for artifact_def in data[name].get('artifacts')] if data[name].get('artifacts') is not None else [],
+    )
+
+def create_group_type(data):
+    name = list(data.keys())[0]
+    return GroupType(
+        derived_from=data[name].get('derived_from') if data[name].get('derived_from') is not None else '',
+        version=create_version(data['tosca_definition_version']) if data['tosca_definition_version'] is not None else '',
+        description=data[name].get('description') if data[name].get('description') is not None else '',
+        properties=[create_property_definition(property_def) for property_def in data[name].get('properties')] if data[name].get('properties') is not None else [],
+        members=[member for member in data.get('members')] if data.get('members') is not None else []
+        # interfaces = ListField(InterfaceDefinition())
+    )
+
+def create_policy_type(data):
+    name = list(data.keys())[0]
+    return PolicyType(
+        derived_from=data[name].get('derived_from') if data[name].get('derived_from') is not None else '',
+        version=create_version(data['tosca_definition_version']) if data['tosca_definition_version'] is not None else '',
+        description=data[name].get('description') if data[name].get('description') is not None else '',
+        properties=[create_property_definition(property_def) for property_def in data[name].get('properties')] if data[name].get('properties') is not None else [],
+        targets = [target for target in data.get('targets')] if data.get('targets') is not None else []
     )
 
 #***************************************************************************************************
@@ -169,13 +268,13 @@ def create_service_template(data):
         repositories = [create_repository(repository) for repository in data.get('repositories')] if data.get('repositories') is not None else [],
         # imports = [create_import(iport) for iport in data['imports']],
         artifacts = [create_artifact_type(artifact) for artifact in data.get('artifacts')] if data.get('artifacts') is not None else [],
-        # data_types = [create_data_type(data_type) for data_types in data['data_types']],
-        # capability_types = [create_capability_type(capability_type) for capability_type in data['capability_types']],
+        data_types = [create_data_type(data_type) for data_type in data.get('data_types')] if data.get('data_types') is not None else [],
+        capability_types = [create_capability_type(capability_type) for capability_type in data.get('capability_types')] if data.get('capability_types') is None else [],
         # interface_types = [create_interface_type(interface_type) for interface_type in data['interface_types']],
-        # relationship_types = [create_relationship_type(relationship_type) for relationship_types in data['relationship_types']],
-        # node_types = [create_node_type(node_type) for node_type in data['node_types']],
-        # group_types = [create_group_type(group_type) for group_type in data['group_types']],
-        # policy_types = [create_policy_type(policy_type) for policy_type in data['policy_types']],
+        relationship_types = [create_relationship_type(relationship_type) for relationship_type in data.get('relationship_types')] if data.get('relationship_types') is None else [],
+        node_types = [create_node_type(node_type) for node_type in data.get('node_types')] if data.get('node_types') is not None else [],
+        group_types = [create_group_type(group_type) for group_type in data['group_types']],
+        policy_types = [create_policy_type(policy_type) for policy_type in data['policy_types']],
         topology_template=create_topology_template(data.get('topology_template')) if data.get('topology_template') is not None else ''
     )
 

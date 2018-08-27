@@ -207,6 +207,7 @@ STATIC_ROOT = '/var/www/files/static/'
 MEDIA_ROOT = '/var/www/files/media/'
 MEDIA_URL = 'http://www.sejoule.com/media/'
 
+
 try:
     from local_settings import *
 except ImportError:
