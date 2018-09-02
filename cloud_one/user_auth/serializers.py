@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Account
+from .models import Account, UserJWTSecret
 from .validators import validate_file
 
 
@@ -20,11 +20,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         account_data = validated_data.pop('account')
         user = User.objects.create(**validated_data)
         Account.objects.create(user=user, **account_data)
+        UserJWTSecret.objects.create(user=user)
         return user
 
     def update(self, instance, validated_data):
         account_data = validated_data.pop('account')
-        #if does not exist then handle
         account = instance.account
 
         instance.first_name = validated_data.get('first_name',instance.first_name)

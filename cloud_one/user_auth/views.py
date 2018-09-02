@@ -1,18 +1,20 @@
 from django.shortcuts import render
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from rest_framework import viewsets, status
-from rest_framework.decorators import permission_classes, api_view
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer, AvatarSerializer
 from rest_framework.views import APIView
-from rest_framework.parsers import FileUploadParser, MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import UserJWTSecret
+import uuid
 
 
 
 class UserViewSet(viewsets.ViewSet):
-
+    '''
+    ViewSet for CRUD operations on the user account
+    '''
     parser_classes = (MultiPartParser, FormParser)
 
     def list(self, request):
@@ -50,15 +52,29 @@ class UserViewSet(viewsets.ViewSet):
         pass
 
 
+class UserLogoutAllView(APIView):
+    '''
+    Provides an APIView for logging out a user from all
+    server sessions. The user's jwt secret is be changed so
+    that the token becomes invalid.
+    '''
+    def post(self, request, *args, **kwargs):
+        pk = request.data.get('id')
+        try:
+            user_jwt = UserJWTSecret.objects.get(user_id=pk)
+            user_jwt.jwt_secret = uuid.uuid4()
+            user_jwt.save()
+            return Response(data={'username': user_jwt.user.username}, status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 class UserAvatarViewSet(viewsets.ViewSet):
+    '''
+    ViewSet that for changing the user's profile avatar.
+    It will return the user's account if successful
+    '''
     parser_classes = (MultiPartParser, FormParser)
-    # def retrieve(self, request, pk=None):
-    #     try:
-    #         user = User.objects.get(id=pk)
-    #         serializer = AvatarSerializer(user)
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
-    #     except User.DoesNotExist:
-    #         return Response(status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk=None):
         try:
@@ -66,28 +82,10 @@ class UserAvatarViewSet(viewsets.ViewSet):
             serializer = AvatarSerializer(user, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+                user_serializer = UserSerializer(user)
+                return Response(user_serializer.data, status=status.HTTP_202_ACCEPTED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-# class AvatarUploadView(APIView):
-#     parser_classes = (MultiPartParser, FormParser)
-#     def put(self, request, *args, **kwargs):
-#         avatar_serializer = AvatarSerializer(data=request.data)
-#         if avatar_serializer.is_valid():
-#             current_user = User.objects.get(username=UserSerializer(request.user).data['username'])
-#             try:
-#                 avatar = avatar_serializer.validated_data['file']
-#                 avatar_file = AvatarFile(
-#                     file=avatar,
-#                     user=current_user,
-#                     created_date=datetime.datetime.today()
-#                 )
-#                 avatar_file.save()
-#             except ValidationError as e:
-#                 return Response(e.to_dict(), status=status.HTTP_400_BAD_REQUEST)
-#             return Response({'user': UserSerializer(current_user).data, 'url': avatar_file.file.url}, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(avatar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

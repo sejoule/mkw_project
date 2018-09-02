@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls import url, include
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
+from user_auth.views import UserLogoutAllView
 # from user_auth.serializers import UserSerializer
 from django.contrib.auth.models import User
 
@@ -33,8 +34,10 @@ urlpatterns = [
     #NOTE: admin and auth urls
     url(r'^admin', admin.site.urls),
     url(r'^api-user_auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-user_auth/logout', UserLogoutAllView.as_view(), name='user-logout-all'),
     url(r'^api-token-user_auth/', obtain_jwt_token),
     url(r'^api-token-refresh/', refresh_jwt_token),
     url(r'^api-token-verify/', verify_jwt_token), # we may not need this
+
 ]
 

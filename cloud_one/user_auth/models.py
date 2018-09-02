@@ -1,12 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
-from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+
 import os
+import uuid
 from cloud_one import settings
+
+
+class UserJWTSecret(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='jwt_secret')
+    jwt_secret = models.UUIDField(default=uuid.uuid4)
 
 
 class Account(models.Model):
@@ -18,8 +22,6 @@ class Account(models.Model):
     LVL1 = '1'
     LVL2 = '2'
     ACCOUNT_LEVELS = ((LVL1, 'Level_1'), (LVL2, 'Level_2'))
-
-
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='account', null=True)
     description = models.TextField(max_length=255, blank= True)
@@ -36,17 +38,6 @@ class Account(models.Model):
     def delete_avatar(self):
         os.remove(os.path.join(settings.MEDIA_ROOT, self.avatar.name))
 
-
-# class AvatarFile(models.Model):
-#     file = models.FileField(blank=True, null=True)
-#     user = models.ForeignKey(User, on_delete=CASCADE, null= True) #NOTE the user that uploaded the avatar
-#     created_date = models.DateTimeField(null=True)
-
-# @receiver(post_save, sender=User)
-# def create_user_profile(sender, instance, created, **kwargs):
-#     if created:
-#         Account.objects.create(user=instance)
-#
-# @receiver(post_save, sender=User)
-# def save_user_profile(sender, instance, **kwargs):
-#     instance.profile.save()
+# NOTE: Helper function to get the jwt token
+def jwt_get_secret_key(user):
+    return user.jwt_secret

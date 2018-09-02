@@ -8,5 +8,4 @@ router.register(r'avatar', UserAvatarViewSet, base_name='avatar')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-    # url(r'^avatar/change', AvatarUploadView.as_view()),
 ]

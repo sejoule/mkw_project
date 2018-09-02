@@ -92,7 +92,7 @@ DATABASES = {
     }
 }
 
-#if the db is moved to another server then this must be edited.
+#NOTE: if the db is moved to another server then this must be edited.
 from mongoengine import *
 connect('tosca')
 # connect(
@@ -107,9 +107,9 @@ connect('tosca')
 # DATABASE_ROUTERS = ['tosca.models.MyDB2Router',]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -126,6 +126,8 @@ REST_FRAMEWORK = {
     ),
 }
 
+REST_SESSION_LOGIN = False
+
 JWT_AUTH = {
     'JWT_ENCODE_HANDLER':
     'rest_framework_jwt.utils.jwt_encode_handler',
@@ -140,11 +142,12 @@ JWT_AUTH = {
     'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
 
     'JWT_RESPONSE_PAYLOAD_HANDLER':
-    # 'rest_framework_jwt.utils.jwt_response_payload_handler',
     'user_auth.utils.jwt_response_payload_handler',
 
-    'JWT_SECRET_KEY': SECRET_KEY,
-    'JWT_GET_USER_SECRET_KEY': None,
+    'JWT_GET_USER_SECRET_KEY': 'user_auth.models.jwt_get_secret_key',
+
+    # 'JWT_SECRET_KEY': SECRET_KEY,
+    # 'JWT_GET_USER_SECRET_KEY': None,
     'JWT_PUBLIC_KEY': None,
     'JWT_PRIVATE_KEY': None,
     'JWT_ALGORITHM': 'HS256',
@@ -162,7 +165,7 @@ JWT_AUTH = {
     'JWT_AUTH_COOKIE': None,
 }
 
-SECRET_KEY = 'Phy$1k@l'
+# SECRET_KEY = 'Phy$1k@l'
 
 
 # Password validation
