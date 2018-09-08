@@ -20,8 +20,8 @@ def instantiate_app(request):
     #NOTE launch the template here.
 
 def create_node(itype):
-	AWS_ACCESS_KEY_ID = 'AKIAJ5C7RLCLY663JKKA'
-	AWS_SECRET_ACCESS_KEY = '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'
+	AWS_ACCESS_KEY_ID = 'AKIAXXXXXXXXXXXXXXKA'
+	AWS_SECRET_ACCESS_KEY = 'Some-access-key'
 	AMI_ID = 'ami-02c8553c261eda3bd'
 	SIZE_ID = itype
 	AWS_REGION = 'ap-northeast-2'
